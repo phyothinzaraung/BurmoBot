@@ -1,6 +1,7 @@
 package dev.phyo.burmobot.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dev.phyo.burmobot.data.local.ZipFileHelper
@@ -26,9 +27,19 @@ class DictionaryRepositoryImpl(
                 val jsonString = it.readText()
                 val type = object : TypeToken<List<DictionaryEntry>>() {}.type
                 val words: List<DictionaryEntry> = Gson().fromJson(jsonString, type)
-                dictionaryDao.insertAll(words)
+                val wordsWithUniqueIds = words.mapIndexed { index, entry ->
+                    entry.copy(id = index.toLong())
+                }
+                try {
+                    dictionaryDao.insertAll(wordsWithUniqueIds)
+                } catch (e: Exception) {
+                    Log.e("DictionaryRepository", "Error inserting words into database", e)
+                }
                 return@withContext words
-            } ?: emptyList()
+            } ?: run {
+                Log.d("DictionaryRepository", "No JSON file found")
+                return@withContext emptyList()
+            }
         }
     }
 }
