@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.phyo.burmobot.data.model.DictionaryEntry
-import dev.phyo.burmobot.data.repository.DictionaryRepositoryImpl
 import dev.phyo.burmobot.domain.usecase.GetDictionaryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,5 +22,9 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _dictionaryEntries.value = getDictionaryUseCase.execute()
         }
+    }
+
+    fun translateToMyanmar(text: String, dictionary: List<DictionaryEntry>): String {
+        return dictionary.find { it.word.equals(text, ignoreCase = true) }?.definition ?: "Translation Not Found"
     }
 }
