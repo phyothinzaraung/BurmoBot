@@ -1,4 +1,4 @@
-package dev.phyo.burmobot.presentation.viewmodel
+package dev.phyo.burmobot.presentation.chatboscreen.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

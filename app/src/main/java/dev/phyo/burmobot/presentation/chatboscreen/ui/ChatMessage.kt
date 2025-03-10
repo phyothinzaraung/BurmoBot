@@ -1,4 +1,4 @@
-package dev.phyo.burmobot.presentation.ui
+package dev.phyo.burmobot.presentation.chatboscreen.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,17 +35,18 @@ fun ChatMessage(
     output: String,
     isFavorite: Boolean,
     onFavoriteClick: (Boolean) -> Unit,
-    onSpeak:() -> Unit
+    onSpeak:() -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var favorite by remember { mutableStateOf(isFavorite) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.8f)
                 .padding(4.dp)
                 .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(8.dp))
@@ -54,10 +55,10 @@ fun ChatMessage(
             Text(text = input, color = Color.Black)
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = modifier.height(4.dp))
 
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(0.8f)
                 .align(Alignment.End)
                 .padding(4.dp)
@@ -65,11 +66,11 @@ fun ChatMessage(
                 .padding(4.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth()
             ) {
                 if (output != "Translation Not Found"){
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -78,7 +79,7 @@ fun ChatMessage(
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f).padding(16.dp)
+                            modifier = modifier.weight(1f).padding(16.dp)
                         )
                         Row {
                             IconButton(onClick = { onSpeak() }) {
@@ -103,7 +104,7 @@ fun ChatMessage(
                 }
                 HtmlTextView(
                     htmlContent = output,
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxWidth()
                         .padding(8.dp)
                 )

@@ -1,4 +1,4 @@
-package dev.phyo.burmobot.presentation.ui
+package dev.phyo.burmobot.presentation.chatboscreen.ui
 
 import android.graphics.Color
 import android.webkit.WebView

@@ -1,4 +1,4 @@
-package dev.phyo.burmobot.presentation.ui
+package dev.phyo.burmobot.presentation.chatboscreen.ui
 
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.background
@@ -41,11 +41,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.phyo.burmobot.presentation.viewmodel.MainViewModel
+import androidx.navigation.NavHostController
+import dev.phyo.burmobot.presentation.util.Screen
+import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.MainViewModel
+import dev.phyo.burmobot.presentation.util.ToolbarTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatbotScreen(viewModel: MainViewModel) {
+fun ChatbotScreen(viewModel: MainViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var userInput by remember { mutableStateOf("") }
@@ -58,14 +61,7 @@ fun ChatbotScreen(viewModel: MainViewModel) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Burmo Bot",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6200EE),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
+                    ToolbarTitle("Burmo Bot")
                 },
                 actions = {
                     IconButton(onClick = { menuExpanded = true }) {
@@ -78,32 +74,32 @@ fun ChatbotScreen(viewModel: MainViewModel) {
                     DropdownMenu(
                         expanded = menuExpanded,
                         onDismissRequest = { menuExpanded = false },
-                        modifier = Modifier.background(Color.White)
+                        modifier = modifier.background(Color.White)
                     ) {
                         DropdownMenuItem(text = { Text("Favorites") }, onClick = {
                             menuExpanded = false
-                            // Handle Favorites action
+                            navController.navigate(Screen.FavouritesScreen.route)
                         })
                         DropdownMenuItem(text = { Text("Recent") }, onClick = {
                             menuExpanded = false
-                            // Handle Recent action
+                            navController.navigate(Screen.RecentScreen.route)
                         })
                         DropdownMenuItem(text = { Text("About") }, onClick = {
                             menuExpanded = false
-                            // Handle About action
+                            navController.navigate(Screen.AboutScreen.route)
                         })
                     }
                 }
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
+        Column(modifier = modifier
             .fillMaxSize()
             .padding(paddingValues)
             .padding(16.dp)
             .background(color = Color(0xFFF5F5F5))
         ) {
-            Column(modifier = Modifier
+            Column(modifier = modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .background(Color.White, shape = RoundedCornerShape(8.dp))
@@ -119,7 +115,7 @@ fun ChatbotScreen(viewModel: MainViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = modifier.height(8.dp))
 
             OutlinedTextField(
                 value = userInput,
@@ -134,7 +130,7 @@ fun ChatbotScreen(viewModel: MainViewModel) {
                         keyboardController?.hide()
                     }
                 }),
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .background(Color.White, shape = RoundedCornerShape(24.dp)),
