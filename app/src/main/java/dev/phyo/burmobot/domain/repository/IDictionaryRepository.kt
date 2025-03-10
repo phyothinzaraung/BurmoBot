@@ -2,6 +2,6 @@ package dev.phyo.burmobot.domain.repository
 
 import dev.phyo.burmobot.data.model.DictionaryEntry
 
-interface DictionaryRepository {
+interface IDictionaryRepository {
     suspend fun getDictionary(): List<DictionaryEntry>
 }

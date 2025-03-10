@@ -3,11 +3,13 @@ package dev.phyo.burmobot.presentation.chatboscreen.ui
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -36,19 +38,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import dev.phyo.burmobot.R
 import dev.phyo.burmobot.presentation.util.Screen
-import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.MainViewModel
+import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.ChatBotViewModel
 import dev.phyo.burmobot.presentation.util.ToolbarTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatbotScreen(viewModel: MainViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+fun ChatbotScreen(viewModel: ChatBotViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var userInput by remember { mutableStateOf("") }
@@ -61,7 +62,16 @@ fun ChatbotScreen(viewModel: MainViewModel, navController: NavHostController, mo
         topBar = {
             TopAppBar(
                 title = {
-                    ToolbarTitle("Burmo Bot")
+                    Row {
+                        Icon(
+                            painter = painterResource(R.drawable.bot),
+                            contentDescription = "App Icon",
+                            modifier = modifier.size(32.dp)
+                                .padding(end = 8.dp),
+                            tint = Color(0xFF6200EE)
+                        )
+                        ToolbarTitle("Burmo Bot")
+                    }
                 },
                 actions = {
                     IconButton(onClick = { menuExpanded = true }) {

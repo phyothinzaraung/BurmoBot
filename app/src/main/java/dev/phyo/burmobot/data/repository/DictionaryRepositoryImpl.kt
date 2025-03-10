@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken
 import dev.phyo.burmobot.data.local.ZipFileHelper
 import dev.phyo.burmobot.data.local.dao.DictionaryDao
 import dev.phyo.burmobot.data.model.DictionaryEntry
-import dev.phyo.burmobot.domain.repository.DictionaryRepository
+import dev.phyo.burmobot.domain.repository.IDictionaryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,7 +15,7 @@ import java.io.File
 class DictionaryRepositoryImpl(
     private val context: Context,
     private val dictionaryDao: DictionaryDao
-): DictionaryRepository {
+): IDictionaryRepository {
     override suspend fun getDictionary(): List<DictionaryEntry> {
         return withContext(Dispatchers.IO){
             val cachedWords = dictionaryDao.getAllWords()

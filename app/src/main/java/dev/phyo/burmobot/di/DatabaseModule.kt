@@ -8,6 +8,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.phyo.burmobot.data.local.dao.DictionaryDao
+import dev.phyo.burmobot.data.local.dao.FavouriteDao
+import dev.phyo.burmobot.data.local.dao.RecentDao
 import dev.phyo.burmobot.data.local.database.DictionaryDatabase
 import javax.inject.Singleton
 
@@ -28,5 +30,15 @@ object DatabaseModule {
     @Provides
     fun providesDictionaryDao(database: DictionaryDatabase): DictionaryDao{
         return database.dictionaryDao()
+    }
+
+    @Provides
+    fun providesFavouriteDao(database: DictionaryDatabase): FavouriteDao{
+        return database.favouriteDao()
+    }
+
+    @Provides
+    fun providesRecentDao(database: DictionaryDatabase): RecentDao{
+        return database.recentDao()
     }
 }

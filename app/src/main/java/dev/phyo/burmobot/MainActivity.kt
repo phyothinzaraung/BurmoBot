@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.phyo.burmobot.presentation.aboutscreen.ui.AboutScreen
 import dev.phyo.burmobot.presentation.util.Screen
 import dev.phyo.burmobot.presentation.chatboscreen.ui.ChatbotScreen
-import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.MainViewModel
+import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.ChatBotViewModel
 import dev.phyo.burmobot.presentation.favouritescreen.ui.FavouriteScreen
 import dev.phyo.burmobot.presentation.recentscreen.ui.RecentScreen
 import dev.phyo.burmobot.ui.theme.BurmoBotTheme
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation(navController: NavHostController) {
     NavHost(navController =  navController, startDestination = Screen.ChatBotScreen.route){
         composable(route = Screen.ChatBotScreen.route) {
-            ChatbotScreen(viewModel = hiltViewModel<MainViewModel>(), navController)
+            ChatbotScreen(viewModel = hiltViewModel<ChatBotViewModel>(), navController)
         }
         composable(route = Screen.FavouritesScreen.route) {
             FavouriteScreen()
