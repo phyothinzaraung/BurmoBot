@@ -16,7 +16,10 @@ import dev.phyo.burmobot.presentation.util.Screen
 import dev.phyo.burmobot.presentation.chatboscreen.ui.ChatbotScreen
 import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.ChatBotViewModel
 import dev.phyo.burmobot.presentation.favouritescreen.ui.FavouriteScreen
+import dev.phyo.burmobot.presentation.favouritescreen.viewmodel.FavouriteViewModel
 import dev.phyo.burmobot.presentation.recentscreen.ui.RecentScreen
+import dev.phyo.burmobot.presentation.recentscreen.viewmodel.RecentViewModel
+import dev.phyo.burmobot.presentation.recentscreen.viewmodel.RecentViewModel_Factory
 import dev.phyo.burmobot.ui.theme.BurmoBotTheme
 
 @AndroidEntryPoint
@@ -36,7 +39,12 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation(navController: NavHostController) {
     NavHost(navController =  navController, startDestination = Screen.ChatBotScreen.route){
         composable(route = Screen.ChatBotScreen.route) {
-            ChatbotScreen(viewModel = hiltViewModel<ChatBotViewModel>(), navController)
+            ChatbotScreen(
+                chatBotViewModel = hiltViewModel<ChatBotViewModel>(),
+                favouriteViewModel = hiltViewModel<FavouriteViewModel>(),
+                recentViewModel = hiltViewModel<RecentViewModel>(),
+                navController
+            )
         }
         composable(route = Screen.FavouritesScreen.route) {
             FavouriteScreen()

@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.twotone.Face
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,17 +29,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.phyo.burmobot.data.model.RecentEntry
+import dev.phyo.burmobot.presentation.recentscreen.viewmodel.RecentViewModel
 
 @Composable
 fun ChatMessage(
+    recentViewModel: RecentViewModel,
     input: String,
     output: String,
     isFavorite: Boolean,
-    onFavoriteClick: (Boolean) -> Unit,
+    onFavoriteClick: (Boolean, String) -> Unit,
     onSpeak:() -> Unit,
     modifier: Modifier = Modifier
 ) {
     var favorite by remember { mutableStateOf(isFavorite) }
+
+    LaunchedEffect(key1 = Unit) {
+        addRecent(input, recentViewModel)
+    }
 
     Column(
         modifier = modifier
@@ -84,14 +92,14 @@ fun ChatMessage(
                         Row {
                             IconButton(onClick = { onSpeak() }) {
                                 Icon(
-                                    imageVector = Icons.TwoTone.Face,
+                                    imageVector = Icons.Default.PlayArrow,
                                     contentDescription = "Speak",
                                     tint = Color.White
                                 )
                             }
                             IconButton(onClick = {
                                 favorite = !favorite
-                                onFavoriteClick(favorite)
+                                onFavoriteClick(favorite, input )
                             }) {
                                 Icon(
                                     imageVector = if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -111,4 +119,11 @@ fun ChatMessage(
             }
         }
     }
+}
+
+fun addRecent(input: String, recentViewModel: RecentViewModel){
+    val recent = RecentEntry(
+        word = input
+    )
+    recentViewModel.insertRecent(recent)
 }

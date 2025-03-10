@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.phyo.burmobot.data.model.DictionaryEntry
+import dev.phyo.burmobot.domain.usecase.GetDictionaryByWordUseCase
 import dev.phyo.burmobot.domain.usecase.GetDictionaryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatBotViewModel @Inject constructor(
-    getDictionaryUseCase: GetDictionaryUseCase
+    private val getDictionaryUseCase: GetDictionaryUseCase,
+    private val getDictionaryByWordUseCase: GetDictionaryByWordUseCase
 ): ViewModel() {
 
     private val _dictionaryEntries = MutableStateFlow<List<DictionaryEntry>>(emptyList())
@@ -21,6 +23,16 @@ class ChatBotViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _dictionaryEntries.value = getDictionaryUseCase.execute()
+        }
+    }
+
+    private val _dictionaryEntry = MutableStateFlow<DictionaryEntry?>(null)
+    val dictionaryEntry: StateFlow<DictionaryEntry?>
+        get() = _dictionaryEntry
+
+    fun getDictionaryByWord(word: String){
+        viewModelScope.launch {
+            _dictionaryEntry.value = getDictionaryByWordUseCase.execute(word) ?: DictionaryEntry(id = 0, word = word, definition = "Translation Not Found")
         }
     }
 

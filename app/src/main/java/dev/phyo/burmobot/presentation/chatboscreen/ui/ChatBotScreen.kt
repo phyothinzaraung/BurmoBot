@@ -41,22 +41,33 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import dev.phyo.burmobot.R
+import dev.phyo.burmobot.data.model.FavouriteEntry
 import dev.phyo.burmobot.presentation.util.Screen
 import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.ChatBotViewModel
+import dev.phyo.burmobot.presentation.favouritescreen.viewmodel.FavouriteViewModel
+import dev.phyo.burmobot.presentation.recentscreen.viewmodel.RecentViewModel
 import dev.phyo.burmobot.presentation.util.ToolbarTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatbotScreen(viewModel: ChatBotViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+fun ChatbotScreen(
+    chatBotViewModel: ChatBotViewModel,
+    favouriteViewModel: FavouriteViewModel,
+    recentViewModel: RecentViewModel,
+    navController: NavHostController,
+    modifier: Modifier = Modifier)
+{
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var userInput by remember { mutableStateOf("") }
     var chatHistory by remember { mutableStateOf(listOf<Pair<String, String>>()) }
     val tts = rememberTextToSpeech(context)
-    val dictionary by viewModel.dictionaryEntries.collectAsState()
+    val dictionary by chatBotViewModel.dictionaryEntries.collectAsState()
     var menuExpanded by remember { mutableStateOf(false) }
+    val favouriteEntry by chatBotViewModel.dictionaryEntry.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -117,8 +128,25 @@ fun ChatbotScreen(viewModel: ChatBotViewModel, navController: NavHostController,
                 .verticalScroll(rememberScrollState())
             ) {
                 chatHistory.forEach { (input, output) ->
-                    ChatMessage(input, output, isFavorite = false,
-                        onFavoriteClick = {},
+                    ChatMessage(recentViewModel, input, output, isFavorite = false,
+                        onFavoriteClick = { isFav, favouriteWord ->
+                            chatBotViewModel.getDictionaryByWord(word = favouriteWord)
+
+                            val entry = favouriteEntry?.let {
+                                FavouriteEntry(
+                                    it.id,
+                                    it.word,
+                                    it.stripWord
+                                )
+                            }
+                            entry?.let {
+                                if (isFav){
+                                    favouriteViewModel.insertFavourite(entry)
+                                }else{
+                                    favouriteViewModel.deleteFavourite(entry)
+                                }
+                            }
+                        },
                         onSpeak = {
                             tts?.speak(input, TextToSpeech.QUEUE_FLUSH, null, null)
                         })
@@ -134,7 +162,7 @@ fun ChatbotScreen(viewModel: ChatBotViewModel, navController: NavHostController,
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = {
                     if (userInput.isNotBlank()) {
-                        val translation = viewModel.translateToMyanmar(userInput, dictionary)
+                        val translation = chatBotViewModel.translateToMyanmar(userInput, dictionary)
                         chatHistory = chatHistory + (userInput to translation)
                         userInput = ""
                         keyboardController?.hide()
@@ -155,7 +183,7 @@ fun ChatbotScreen(viewModel: ChatBotViewModel, navController: NavHostController,
                 trailingIcon = {
                     IconButton(onClick = {
                         if (userInput.isNotBlank()){
-                            val translation = viewModel.translateToMyanmar(userInput, dictionary)
+                            val translation = chatBotViewModel.translateToMyanmar(userInput, dictionary)
                             chatHistory = chatHistory + (userInput to translation)
                             userInput = ""
                             keyboardController?.hide()

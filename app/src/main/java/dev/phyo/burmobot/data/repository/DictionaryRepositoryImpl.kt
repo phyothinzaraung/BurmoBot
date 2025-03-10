@@ -42,4 +42,8 @@ class DictionaryRepositoryImpl(
             }
         }
     }
+
+    override suspend fun getDictionaryByWord(word: String): DictionaryEntry? {
+        return dictionaryDao.getDictionaryByWord(word)
+    }
 }

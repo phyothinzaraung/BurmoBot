@@ -13,4 +13,7 @@ interface DictionaryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(entries: List<DictionaryEntry>)
+
+    @Query("SELECT * FROM dictionary_entries where word = :word")
+    suspend fun getDictionaryByWord(word: String): DictionaryEntry?
 }
