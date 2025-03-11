@@ -3,13 +3,11 @@ package dev.phyo.burmobot.presentation.chatboscreen.ui
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -17,18 +15,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,20 +32,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import dev.phyo.burmobot.R
 import dev.phyo.burmobot.data.model.FavouriteEntry
-import dev.phyo.burmobot.presentation.util.Screen
+import dev.phyo.burmobot.data.model.RecentEntry
 import dev.phyo.burmobot.presentation.chatboscreen.viewmodel.ChatBotViewModel
 import dev.phyo.burmobot.presentation.favouritescreen.viewmodel.FavouriteViewModel
 import dev.phyo.burmobot.presentation.recentscreen.viewmodel.RecentViewModel
-import dev.phyo.burmobot.presentation.util.ToolbarTitle
+import dev.phyo.burmobot.ui.theme.PrimaryColor
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatbotScreen(
     chatBotViewModel: ChatBotViewModel,
@@ -66,52 +57,39 @@ fun ChatbotScreen(
     var chatHistory by remember { mutableStateOf(listOf<Pair<String, String>>()) }
     val tts = rememberTextToSpeech(context)
     val dictionary by chatBotViewModel.dictionaryEntries.collectAsState()
-    var menuExpanded by remember { mutableStateOf(false) }
     val favouriteEntry by chatBotViewModel.dictionaryEntry.collectAsStateWithLifecycle()
+    val recentEntries by recentViewModel.recentEntries.collectAsStateWithLifecycle()
+
+    LaunchedEffect(recentEntries) {
+        chatHistory = recentEntries.mapNotNull { entry ->
+            entry.word?.let { word ->
+                entry.definition?.let { definition ->
+                    word to definition
+                }
+            }
+        }
+    }
+
+    fun isEntryDuplicate(input: String, output: String): Boolean{
+        return recentEntries.any { it.word == input && it.definition == output }
+    }
+
+    fun sendWordAction(){
+        if (userInput.isNotBlank()){
+            val normalizedInput = userInput.trim().replace("\\s+".toRegex(), " ")
+            val translation = chatBotViewModel.translateToMyanmar(normalizedInput, dictionary)
+            if (!isEntryDuplicate(userInput, translation)){
+                chatHistory = chatHistory + (userInput to translation)
+                addRecent(userInput, translation, recentViewModel)
+            }
+            userInput = ""
+            keyboardController?.hide()
+        }
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Row {
-                        Icon(
-                            painter = painterResource(R.drawable.bot),
-                            contentDescription = "App Icon",
-                            modifier = modifier.size(32.dp)
-                                .padding(end = 8.dp),
-                            tint = Color(0xFF6200EE)
-                        )
-                        ToolbarTitle("Burmo Bot")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { menuExpanded = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
-                            tint = Color(0xFF6200EE)
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false },
-                        modifier = modifier.background(Color.White)
-                    ) {
-                        DropdownMenuItem(text = { Text("Favorites") }, onClick = {
-                            menuExpanded = false
-                            navController.navigate(Screen.FavouritesScreen.route)
-                        })
-                        DropdownMenuItem(text = { Text("Recent") }, onClick = {
-                            menuExpanded = false
-                            navController.navigate(Screen.RecentScreen.route)
-                        })
-                        DropdownMenuItem(text = { Text("About") }, onClick = {
-                            menuExpanded = false
-                            navController.navigate(Screen.AboutScreen.route)
-                        })
-                    }
-                }
-            )
+            PrimaryTopAppBar(navController)
         }
     ) { paddingValues ->
         Column(modifier = modifier
@@ -161,12 +139,7 @@ fun ChatbotScreen(
                 placeholder = { Text("Type a word...") },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = {
-                    if (userInput.isNotBlank()) {
-                        val translation = chatBotViewModel.translateToMyanmar(userInput, dictionary)
-                        chatHistory = chatHistory + (userInput to translation)
-                        userInput = ""
-                        keyboardController?.hide()
-                    }
+                    sendWordAction()
                 }),
                 modifier = modifier
                     .fillMaxWidth()
@@ -174,29 +147,32 @@ fun ChatbotScreen(
                     .background(Color.White, shape = RoundedCornerShape(24.dp)),
                 shape = RoundedCornerShape(24.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF6200EE),
+                    focusedBorderColor = PrimaryColor,
                     unfocusedLabelColor = Color.Gray,
-                    cursorColor = Color(0xFF6200EE),
+                    cursorColor = PrimaryColor,
                     focusedTextColor = Color.Black,
                     unfocusedBorderColor = Color.Black
                 ),
                 trailingIcon = {
                     IconButton(onClick = {
-                        if (userInput.isNotBlank()){
-                            val translation = chatBotViewModel.translateToMyanmar(userInput, dictionary)
-                            chatHistory = chatHistory + (userInput to translation)
-                            userInput = ""
-                            keyboardController?.hide()
-                        }
+                        sendWordAction()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "send",
-                            tint = Color(0xFF6200EE)
+                            tint = PrimaryColor
                         )
                     }
                 }
             )
         }
     }
+}
+
+private fun addRecent(input: String, output: String, recentViewModel: RecentViewModel){
+    val recent = RecentEntry(
+        word = input,
+        definition = output
+    )
+    recentViewModel.insertRecent(recent)
 }

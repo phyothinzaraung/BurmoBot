@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.phyo.burmobot.data.model.RecentEntry
 import dev.phyo.burmobot.domain.usecase.ClearAllRecentUseCase
+import dev.phyo.burmobot.domain.usecase.GetLatestRecentUseCase
 import dev.phyo.burmobot.domain.usecase.GetRecentUseCase
 import dev.phyo.burmobot.domain.usecase.InsertRecentUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class RecentViewModel @Inject constructor(
     private val getRecentUseCase: GetRecentUseCase,
     private val insertRecentUseCase: InsertRecentUseCase,
-    private val clearAllRecentUseCase: ClearAllRecentUseCase
+    private val clearAllRecentUseCase: ClearAllRecentUseCase,
+    private val getLatestRecentUseCase: GetLatestRecentUseCase
 ): ViewModel() {
 
     fun insertRecent(recentEntry: RecentEntry){
@@ -35,9 +37,9 @@ class RecentViewModel @Inject constructor(
     val recentEntries: StateFlow<List<RecentEntry>>
         get() = _recentEntries
 
-    fun getRecentEntries(){
+    init {
         viewModelScope.launch {
-            _recentEntries.value = getRecentUseCase.execute()
+            _recentEntries.value = getLatestRecentUseCase.execute()
         }
     }
 }

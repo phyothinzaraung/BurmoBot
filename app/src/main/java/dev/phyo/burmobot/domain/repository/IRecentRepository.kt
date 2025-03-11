@@ -8,4 +8,6 @@ interface IRecentRepository {
     suspend fun clearAllRecentEntries()
 
     suspend fun getRecentEntries(): List<RecentEntry>
+
+    suspend fun getLatestRecentEntries(): List<RecentEntry>
 }

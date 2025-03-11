@@ -18,4 +18,8 @@ class RecentRepositoryImpl(
     override suspend fun getRecentEntries(): List<RecentEntry> {
         return recentDao.getRecentEntries()
     }
+
+    override suspend fun getLatestRecentEntries(): List<RecentEntry> {
+        return recentDao.getLatestRecentEntries()
+    }
 }

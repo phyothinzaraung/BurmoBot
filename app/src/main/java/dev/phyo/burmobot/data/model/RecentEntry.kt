@@ -9,5 +9,6 @@ data class RecentEntry(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     var id: Long = 0L,
-    var word: String? = null
+    var word: String? = null,
+    val definition: String? = null
 )

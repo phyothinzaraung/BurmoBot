@@ -14,6 +14,9 @@ interface RecentDao {
     @Query("SELECT * FROM recent_entries")
     suspend fun getRecentEntries(): List<RecentEntry>
 
+    @Query("SELECT * FROM (SELECT * FROM recent_entries ORDER BY _id DESC LIMIT 5) ORDER BY _id ASC")
+    suspend fun getLatestRecentEntries(): List<RecentEntry>
+
     @Query("DELETE FROM recent_entries")
     suspend fun clearRecentEntries()
 }

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.phyo.burmobot.data.model.RecentEntry
 import dev.phyo.burmobot.presentation.recentscreen.viewmodel.RecentViewModel
+import dev.phyo.burmobot.ui.theme.PrimaryColor
 
 @Composable
 fun ChatMessage(
@@ -44,9 +45,11 @@ fun ChatMessage(
 ) {
     var favorite by remember { mutableStateOf(isFavorite) }
 
-    LaunchedEffect(key1 = Unit) {
-        addRecent(input, recentViewModel)
-    }
+//    LaunchedEffect(key1 = input, key2 = output) {
+//        if (input.isNotBlank() && output.isNotBlank()){
+//            addRecent(input, output,  recentViewModel)
+//        }
+//    }
 
     Column(
         modifier = modifier
@@ -70,7 +73,7 @@ fun ChatMessage(
                 .fillMaxWidth(0.8f)
                 .align(Alignment.End)
                 .padding(4.dp)
-                .background(Color(0xFF6200EE), shape = RoundedCornerShape(8.dp))
+                .background(PrimaryColor, shape = RoundedCornerShape(8.dp))
                 .padding(4.dp)
         ) {
             Column(
@@ -119,11 +122,4 @@ fun ChatMessage(
             }
         }
     }
-}
-
-fun addRecent(input: String, recentViewModel: RecentViewModel){
-    val recent = RecentEntry(
-        word = input
-    )
-    recentViewModel.insertRecent(recent)
 }
